@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>JS Maze Generator</title>
+  </head>
+
+  <body>
+    <h1>JS Maze Generator</h1>
+
+    <form id="mazeAttributes">
+      <label for="rows">Number of rows (minimum 2)</label>
+      <input type="number" name="rows" min="2">
+
+      <label for="columns">Number of columns (minimum 2)</label>
+      <input type="number" name="columns" min="2">
+
+      <button type="submit">Generate</button>
+    </form>
+
+    <figure id="mazeFigure">
+      <pre></pre>
+      <figcaption>Generated Maze</figcaption>
+    </figure>
+
+    <footer>
+      <p>Reference: <a href="http://www.mazesforprogrammers.com/">Mazes for Programmers Ebook</a></p>
+    </footer>
+  </body>
+
+</html>

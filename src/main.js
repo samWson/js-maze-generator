@@ -6,6 +6,14 @@ function Cell(row, column) {
   this.links = new Map();
 }
 
+Cell.prototype.getRow = function() {
+  return this.row;
+}
+
+Cell.prototype.getColumn = function() {
+  return this.column;
+}
+
 Cell.prototype.getNorth = function() {
   return this.north;
 }
@@ -63,8 +71,8 @@ Cell.prototype.neighbors = function() {
 function Grid(rows, columns) {
   this.rows = rows;
   this.columns = columns;
-  this.grid = prepareGrid();
-  configureCells();
+  this.grid = this.prepareGrid();
+  this.configureCells();
 }
 
 Grid.prototype.prepareGrid = function() {
@@ -82,7 +90,9 @@ Grid.prototype.prepareGrid = function() {
 }
 
 Grid.prototype.configureCells = function() {
-  for (let cell in this.eachCell()) {
+  // FIXME: eachCell is returning an array of numbers not cells.
+  // for (let cell in this.eachCell()) {
+  this.eachCell().forEach((cell) => {
     let row = cell.row;
     let column = cell.column;
 
@@ -92,7 +102,7 @@ Grid.prototype.configureCells = function() {
     cell.south = this.cellAt(row + 1, column);
     cell.west = this.cellAt(row, column - 1);
     cell.east = this.cellAt(row, column + 1);
-  }
+  });
 }
 
 Grid.prototype.cellAt = function(row, column) {
@@ -112,15 +122,40 @@ Grid.prototype.eachRow = function() {
 }
 
 Grid.prototype.eachCell = function() {
-  let cells = [];
+  return this.grid.flat();
+}
 
+Grid.prototype.toString = function() {
+  const corner = "+";
+  const horizontal = "---+";
+
+  // Write the top boundary.
+  let output = corner.concat(horizontal.repeat(this.columns), "\n");
+
+  // Write each row.
   for (const [index, row] of this.eachRow()) {
-    for (let cell in row) {
-      cells.push(cell);
-    }
+    let top = "|";
+    let bottom = "+";
+
+    // for (cell in row) {
+    row.forEach((cell) => {
+      let body = "   "; // Three spaces.
+      let eastBoundary = (cell.isLinked(cell.east)) ? " " : "|";
+
+      top += body;
+      top += eastBoundary;
+
+      // Three spaces below, too
+      let southBoundary = (cell.isLinked(cell.south)) ? "   " : "---";
+      bottom += southBoundary;
+      bottom += corner;
+    });
+
+    output += top + "\n";
+    output += bottom + "\n";
   }
 
-  return cells;
+  return output;
 }
 
 function BinaryTree(grid) {
@@ -140,10 +175,10 @@ BinaryTree.prototype.applyAlgorithm = function() {
     }
 
     let index = getRandomInt(neighbors.length);
-    let neighbor = neigbors[index];
+    let neighbor = neighbors[index];
 
-    if (neigbor) {
-      cell.link(neigbor);
+    if (neighbor) {
+      cell.link(neighbor);
     }
   }
 }
@@ -155,15 +190,16 @@ function getRandomInt(max) {
 }
 
 function generateMaze(event) {
+  event.preventDefault();
+
   let formElements = event.currentTarget.elements;
   let rows = formElements.namedItem('rows').value;
   let columns = formElements.namedItem('columns').value;
-  let grid = new Grid(rows, columns);
+
+  let grid = new Grid(parseInt(rows), parseInt(columns));
   let algorithm = new BinaryTree(grid);
   algorithm.applyAlgorithm();
 
-  console.log(grid);
-  console.log("rows " + rows);
-  console.log("columns " + columns);
-  return grid;
+  let mazeArea = document.getElementById('mazeArea');
+  mazeArea.innerText = grid.toString();
 }

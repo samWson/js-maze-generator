@@ -1,71 +1,77 @@
 document.getElementById('mazeAttributes').addEventListener('submit', generateMaze);
 
-function Cell(row, column) {
-  this.row = row;
-  this.column = column;
-  this.links = new Map();
-}
-
-Cell.prototype.getRow = function() {
-  return this.row;
-}
-
-Cell.prototype.getColumn = function() {
-  return this.column;
-}
-
-Cell.prototype.getNorth = function() {
-  return this.north;
-}
-
-Cell.prototype.getSouth = function() {
-  return this.south;
-}
-
-Cell.prototype.getEast = function() {
-  return this.east;
-}
-
-Cell.prototype.getWest = function() {
-  return this.west;
-}
-
-Cell.prototype.link = function(cell, bidirectional = true) {
-  this.links.set(cell, true);
-
-  if (bidirectional) {
-    cell.link(this, false);
+class Cell {
+  constructor(row, column) {
+    this._row = row;
+    this._column = column;
+    this._links = new Map();
   }
-}
 
-Cell.prototype.unlink = function(cell, bidirectional = true) {
-  this.links.delete(cell);
- 
-  if (bidirectional) {
-    cell.unlink(this, false);
+  get row() {
+    return this._row;
   }
-}
 
-Cell.prototype.links = function() {
-  return this.links.keys();
-}
+  set row(number) {
+    this._row = number;
+  }
 
-Cell.prototype.isLinked = function(cell) {
-  return this.links.has(cell);
-}
+  get column() {
+    return this._column;
+  }
 
-Cell.prototype.neighbors = function() {
-  let cells = [];
-  cells.push(this.north);
-  cells.push(this.south);
-  cells.push(this.east);
-  cells.push(this.west);
+  get north() {
+    return this._north;
+  }
 
-  cells = cells.filter(function(cell) {
-    return cell !== undefined;
-  });
+  get south() {
+    return this._south;
+  }
 
-  return cells;
+  get east() {
+    return this._east;
+  }
+
+  get west() {
+    return this._west;
+  }
+
+  link(cell, bidirectional = true) {
+    this._links.set(cell, true);
+
+    if (bidirectional) {
+      cell.link(this, false);
+    }
+  }
+
+  unlink(cell, bidirectional = true) {
+    this._links.delete(cell);
+
+    if (bidirectional) {
+      cell.unlink(this, false);
+    }
+  }
+
+  links() {
+    return this._links.keys();
+  }
+
+  isLinked(cell) {
+    return this._links.has(cell);
+  }
+
+  neighbors() {
+    let cells = [];
+    cells.push(this._north);
+    cells.push(this._south);
+    cells.push(this._east);
+    cells.push(this._west);
+
+    cells = cells.filter(function(cell) {
+      return cell !== undefined;
+    });
+
+    return cells;
+  }
 }
 
 function Grid(rows, columns) {

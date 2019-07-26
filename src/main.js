@@ -1,5 +1,20 @@
 document.getElementById('mazeAttributes').addEventListener('submit', generateMaze);
 
+function generateMaze(event) {
+  event.preventDefault();
+
+  let formElements = event.currentTarget.elements;
+  let rows = formElements.namedItem('rows').value;
+  let columns = formElements.namedItem('columns').value;
+
+  let grid = new Grid(parseInt(rows), parseInt(columns));
+  let algorithm = new BinaryTree(grid);
+  algorithm.applyAlgorithm();
+
+  let mazeArea = document.getElementById('mazeArea');
+  mazeArea.innerText = grid.toString();
+}
+
 class Cell {
   constructor(row, column) {
     this._row = row;
@@ -179,48 +194,35 @@ class Grid {
   }
 }
 
-function BinaryTree(grid) {
-  this.grid = grid;
-}
+class BinaryTree {
+  constructor(grid) {
+    this._grid = grid;
+  }
 
-BinaryTree.prototype.applyAlgorithm = function() {
-  for (let cell in this.grid.eachCell()) {
-    let neighbors = [];
-    
-    if (cell.north) {
-      neighbors.push(cell.north);
-    }
+  applyAlgorithm() {
+    for (let cell in this._grid.eachCell()) {
+      let neighbors = [];
 
-    if (cell.east) {
-      neighbors.push(cell.east);
-    }
+      if (cell.north) {
+        neighbors.push(cell.north);
+      }
 
-    let index = getRandomInt(neighbors.length);
-    let neighbor = neighbors[index];
+      if (cell.east) {
+        neighbors.push(cell.east);
+      }
 
-    if (neighbor) {
-      cell.link(neighbor);
+      let index = getRandomInt(neighbors.length);
+      let neighbor = neighbors[index];
+
+      if (neighbor) {
+        cell.link(neighbor);
+      }
     }
   }
 }
 
-function getRandomInt(max) {
-  min = 0;
-  max = Math.floor(max);
+function getRandomInt(upperBound) {
+  const min = 0;
+  const max = Math.floor(upperBound);
   return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function generateMaze(event) {
-  event.preventDefault();
-
-  let formElements = event.currentTarget.elements;
-  let rows = formElements.namedItem('rows').value;
-  let columns = formElements.namedItem('columns').value;
-
-  let grid = new Grid(parseInt(rows), parseInt(columns));
-  let algorithm = new BinaryTree(grid);
-  algorithm.applyAlgorithm();
-
-  let mazeArea = document.getElementById('mazeArea');
-  mazeArea.innerText = grid.toString();
 }

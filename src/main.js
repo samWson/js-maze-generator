@@ -23,16 +23,32 @@ class Cell {
     return this._north;
   }
 
+  set north(cell) {
+    this._north = cell;
+  }
+
   get south() {
     return this._south;
+  }
+
+  set south(cell) {
+    this._south = cell;
   }
 
   get east() {
     return this._east;
   }
 
+  set east(cell) {
+    this._east = cell;
+  }
+
   get west() {
     return this._west;
+  }
+
+  set west(cell) {
+    this._west = cell;
   }
 
   link(cell, bidirectional = true) {
@@ -74,94 +90,93 @@ class Cell {
   }
 }
 
-function Grid(rows, columns) {
-  this.rows = rows;
-  this.columns = columns;
-  this.grid = this.prepareGrid();
-  this.configureCells();
-}
+class Grid {
+  constructor(rows, columns) {
+    this._rows = rows;
+    this._columns = columns;
+    this._grid = this.prepareGrid();
+    this.configureCells();
+  }
 
-Grid.prototype.prepareGrid = function() {
-  let grid = new Array(this.rows);
+  prepareGrid() {
+    let grid = new Array(this._rows);
 
-  for (let i = 0; i < grid.length; i++) {
-    grid[i] = new Array(this.columns);
+    for (let i = 0; i < grid.length; i++) {
+      grid[i] = new Array(this._columns);
 
-    for (let j = 0; j < grid[i].length; j++) {
-      grid[i][j] = new Cell(i + 1, j + 1);
+      for (let j = 0; j < grid[i].length; j++) {
+        grid[i][j] = new Cell(i + 1, j + 1);
+      }
     }
+
+    return grid;
   }
 
-  return grid;
-}
+  configureCells() {
+    this.eachCell().forEach((cell) => {
+      const row = cell.row;
+      const column = cell.column;
 
-Grid.prototype.configureCells = function() {
-  // FIXME: eachCell is returning an array of numbers not cells.
-  // for (let cell in this.eachCell()) {
-  this.eachCell().forEach((cell) => {
-    let row = cell.row;
-    let column = cell.column;
-
-    // TODO: Check that this arrangement works on the idea that 0,0 on the grid
-    // starts at the top left.
-    cell.north = this.cellAt(row - 1, column);
-    cell.south = this.cellAt(row + 1, column);
-    cell.west = this.cellAt(row, column - 1);
-    cell.east = this.cellAt(row, column + 1);
-  });
-}
-
-Grid.prototype.cellAt = function(row, column) {
-  if (row < 0 || row > this.rows - 1) {
-    return null;
-  }
-
-  if (column < 0 || column > this.columns - 1) {
-    return null;
-  }
-
-  return this.grid[row][column];
-}
-
-Grid.prototype.eachRow = function() {
-  return this.grid.entries();
-}
-
-Grid.prototype.eachCell = function() {
-  return this.grid.flat();
-}
-
-Grid.prototype.toString = function() {
-  const corner = "+";
-  const horizontal = "---+";
-
-  // Write the top boundary.
-  let output = corner.concat(horizontal.repeat(this.columns), "\n");
-
-  // Write each row.
-  for (const [index, row] of this.eachRow()) {
-    let top = "|";
-    let bottom = "+";
-
-    // for (cell in row) {
-    row.forEach((cell) => {
-      let body = "   "; // Three spaces.
-      let eastBoundary = (cell.isLinked(cell.east)) ? " " : "|";
-
-      top += body;
-      top += eastBoundary;
-
-      // Three spaces below, too
-      let southBoundary = (cell.isLinked(cell.south)) ? "   " : "---";
-      bottom += southBoundary;
-      bottom += corner;
+      // TODO: Check that this arrangement works on the idea that 0,0 on the grid
+      // starts at the top left.
+      cell.north = this.cellAt(row - 1, column);
+      cell.south = this.cellAt(row + 1, column);
+      cell.west = this.cellAt(row, column - 1);
+      cell.east = this.cellAt(row, column + 1);
     });
-
-    output += top + "\n";
-    output += bottom + "\n";
   }
 
-  return output;
+  cellAt(row, column) {
+    if (row < 0 || row > this._rows - 1) {
+      return null;
+    }
+
+    if (column < 0 || column > this._columns - 1) {
+      return null;
+    }
+
+    return this._grid[row][column];
+  }
+
+  eachRow() {
+    return this._grid.entries();
+  }
+
+  eachCell() {
+    return this._grid.flat();
+  }
+
+  toString() {
+    const corner = "+";
+    const horizontal = "---+";
+
+    // Write the top boundary.
+    let output = corner.concat(horizontal.repeat(this._columns), "\n");
+
+    // Write each row.
+    for (const [index, row] of this.eachRow()) {
+      let top = "|";
+      let bottom = "+";
+
+      row.forEach((cell) => {
+        let body = "   "; // Three spaces.
+        let eastBoundary = (cell.isLinked(cell.east)) ? " " : "|";
+
+        top += body;
+        top += eastBoundary;
+
+        // Three spaces below, too
+        let southBoundary = (cell.isLinked(cell.south)) ? "   " : "---";
+        bottom += southBoundary;
+        bottom += corner;
+      });
+
+      output += top + "\n";
+      output += bottom + "\n";
+    }
+
+    return output;
+  }
 }
 
 function BinaryTree(grid) {

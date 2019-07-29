@@ -132,8 +132,6 @@ class Grid {
       const row = cell.row;
       const column = cell.column;
 
-      // TODO: Check that this arrangement works on the idea that 0,0 on the grid
-      // starts at the top left.
       cell.north = this.cellAt(row - 1, column);
       cell.south = this.cellAt(row + 1, column);
       cell.west = this.cellAt(row, column - 1);
@@ -142,19 +140,15 @@ class Grid {
   }
 
   cellAt(row, column) {
-    if (row < 0 || row > this._rows - 1) {
-      return null;
+    if (row <= 0 || row > this._rows) {
+      return undefined;
     }
 
-    if (column < 0 || column > this._columns - 1) {
-      return null;
+    if (column <= 0 || column > this._columns) {
+      return undefined;
     }
 
-    return this._grid[row][column];
-  }
-
-  eachRow() {
-    return this._grid.entries();
+    return this._grid[row - 1][column - 1];
   }
 
   eachCell() {
@@ -169,7 +163,7 @@ class Grid {
     let output = corner.concat(horizontal.repeat(this._columns), "\n");
 
     // Write each row.
-    for (const [index, row] of this.eachRow()) {
+    this._grid.forEach((row) => {
       let top = "|";
       let bottom = "+";
 
@@ -188,7 +182,7 @@ class Grid {
 
       output += top + "\n";
       output += bottom + "\n";
-    }
+    });
 
     return output;
   }
@@ -200,7 +194,7 @@ class BinaryTree {
   }
 
   applyAlgorithm() {
-    for (let cell in this._grid.eachCell()) {
+    this._grid.eachCell().forEach((cell) => {
       let neighbors = [];
 
       if (cell.north) {
@@ -217,12 +211,12 @@ class BinaryTree {
       if (neighbor) {
         cell.link(neighbor);
       }
-    }
+    });
   }
 }
 
 function getRandomInt(upperBound) {
   const min = 0;
-  const max = Math.floor(upperBound);
+  const max = Math.floor(upperBound - 1);
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
